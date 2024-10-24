@@ -1,11 +1,11 @@
 require("dotenv").config();
-
+let bodyParser = require("body-parser");
 let express = require("express");
 let app = express();
 
-app.get('/now', function actualTime(req, res, next) {
-  
-})
+/////////////////////////////////////////////////////////////////
+
+// console.log("Hello World");
 
 app.use(function createRegistry(req, res, next) {
   let string = req.method + " " + req.path + " - " + req.ip;
@@ -13,7 +13,7 @@ app.use(function createRegistry(req, res, next) {
   next();
 });
 
-console.log("Hello World");
+/////////////////////////////////////////////////////////////////
 
 app.get("/", function (req, res) {
   //res.send('Hello Express');
@@ -21,7 +21,11 @@ app.get("/", function (req, res) {
   res.sendFile(absolutePath);
 });
 
+/////////////////////////////////////////////////////////////////
+
 app.use("/public", express.static(__dirname + "/public"));
+
+/////////////////////////////////////////////////////////////////
 
 app.get("/json", function (req, res) {
   let response = "Hello json";
@@ -31,5 +35,44 @@ app.get("/json", function (req, res) {
     res.json({ message: response });
   }
 });
+
+/////////////////////////////////////////////////////////////////
+
+app.get("/:word/echo", (req, res) => {
+  res.json({
+    echo: req.params.word,
+  });
+});
+
+/////////////////////////////////////////////////////////////////
+
+app.use("/name", bodyParser.urlencoded({extended: false}));
+
+/* app.get("/name", (req, res) => {
+  let firstName = req.query.first;
+  let lastName = req.query.last;
+  let completedName = `${firstName} ${lastName}`;
+  res.json({ name: completedName });
+}) */
+
+app.post("/name", (req, res) => {
+  let name = req.body.first + " " + req.body.last;
+  res.json({ name: name });
+})
+
+/////////////////////////////////////////////////////////////////
+
+app.get(
+  "/now",
+  function (req, res, next) {
+    req.time = new Date().toString();
+    next();
+  },
+  function (req, res) {
+    res.json({ time: req.time });
+  }
+);
+
+/////////////////////////////////////////////////////////////////
 
 module.exports = app;
